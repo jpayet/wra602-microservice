@@ -11,11 +11,11 @@ class GotenbergService
     ) {
     }
 
-    public function fetchGotenbergAPI(): string
+    public function fetchGotenbergAPI($gotenberg_api): string
     {
         $response = $this->client->request(
             'GET',
-            $_ENV['GOTENBERG_API'].'/health'
+            $gotenberg_api.'/health'
         );
 
         $content = $response->getContent();
@@ -23,11 +23,11 @@ class GotenbergService
         return $content;
     }
 
-    public function generatePdf(): string
+    public function generatePdf($gotenberg_api): string
     {
         $response = $this->client->request(
             'POST',
-            $_ENV['GOTENBERG_API'].'/forms/chromium/convert/html',
+            $gotenberg_api.'/forms/chromium/convert/html',
             [
                 'headers' => [
                     'Content-Type'=>'multipart/form-data'
