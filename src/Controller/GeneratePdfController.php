@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class GeneratePdfController extends AbstractController
 {
-    #[Route('/generate-pdf-html', name: 'app_generate_pdf_html')]
+    #[Route('/generate-pdf-html', name: 'app_generate_pdf_html', methods: ['POST'])]
     public function generatePdfHtml(GotenbergService $gotenbergService, ParameterBagInterface $parameterBag, Request $request): StreamedResponse
     {
         $gotenberg_api = $parameterBag->get('microservice_host');
