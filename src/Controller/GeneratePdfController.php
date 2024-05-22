@@ -5,16 +5,18 @@ namespace App\Controller;
 use App\Service\GotenbergService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
 class GeneratePdfController extends AbstractController
 {
-    #[Route('/generate-pdf', name: 'app_generate_pdf')]
-    public function index(GotenbergService $gotenbergService, ParameterBagInterface $parameterBag): StreamedResponse
+    #[Route('/generate-pdf-html', name: 'app_generate_pdf_html')]
+    public function generatePdfHtml(GotenbergService $gotenbergService, ParameterBagInterface $parameterBag, Request $request): StreamedResponse
     {
         $gotenberg_api = $parameterBag->get('microservice_host');
-        $content = $gotenbergService->generatePdf($gotenberg_api);
+        $file = $request->files->get('index.html');
+        $content = $gotenbergService->generatePdfHtml($gotenberg_api, $file);
 
         return new StreamedResponse(function () use ($content) {
             header('Content-Type: application/pdf');
@@ -23,4 +25,20 @@ class GeneratePdfController extends AbstractController
             echo $content;
         });
     }
+
+    #[Route('/generate-pdf-url', name: 'app_generate_pdf_url', methods: ['POST'])]
+    public function generatePdfUrl(GotenbergService $gotenbergService, ParameterBagInterface $parameterBag, Request $request): StreamedResponse
+    {
+        $gotenberg_api = $parameterBag->get('microservice_host');
+        $url = $request->request->get('url');
+        $content = $gotenbergService->generatePdfUrl($gotenberg_api, $url);
+
+        return new StreamedResponse(function () use ($content) {
+            header('Content-Type: application/pdf');
+            header('Content-Disposition: inline; filename="my-pdf.pdf"');
+
+            echo $content;
+        });
+    }
+
 }
