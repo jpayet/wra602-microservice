@@ -23,7 +23,7 @@ class GotenbergService
         return $content;
     }
 
-    public function generatePdf($gotenberg_api): string
+    public function generatePdfHtml($gotenberg_api, $file): string
     {
         $response = $this->client->request(
             'POST',
@@ -36,12 +36,39 @@ class GotenbergService
                     'files' => [
                         'file' => [
                             'name' => 'file',
-                            'contents' => fopen(__DIR__.'/../../templates/pdf/index.html', 'r'),
+                            'contents' => $file,
                         ],
                     ],
                 ],
+//                'body' => [
+//                    'files' => [
+//                        'file' => [
+//                            'name' => 'file',
+//                            'contents' => fopen(__DIR__.'/../../templates/pdf/index.html', 'r'),
+//                        ],
+//                    ],
+//                ],
             ]
         );
+        $content = $response->getContent();
+        return $content;
+    }
+
+    public function generatePdfUrl($gotenberg_api, $url): string
+    {
+        $response = $this->client->request(
+            'POST',
+            $gotenberg_api.'/forms/chromium/convert/url',
+            [
+                'headers' => [
+                    'Content-Type'=>'multipart/form-data'
+                ],
+                'body' => [
+                    'url' => $url,
+                ],
+            ]
+        );
+
         $content = $response->getContent();
         return $content;
     }
