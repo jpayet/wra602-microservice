@@ -11,11 +11,11 @@ class GotenbergService
     ) {
     }
 
-    public function fetchGotenbergAPI($gotenberg_api): string
+    public function fetchGotenbergAPI($gotenbergApi): string
     {
         $response = $this->client->request(
             'GET',
-            $gotenberg_api.'/health'
+            $gotenbergApi.'/health'
         );
 
         $content = $response->getContent();
@@ -23,11 +23,11 @@ class GotenbergService
         return $content;
     }
 
-    public function generatePdfHtml($gotenberg_api, $file): string
+    public function generatePdfHtml($gotenbergApi, $filePath): string
     {
         $response = $this->client->request(
             'POST',
-            $gotenberg_api.'/forms/chromium/convert/html',
+            $gotenbergApi.'/forms/chromium/convert/html',
             [
                 'headers' => [
                     'Content-Type'=>'multipart/form-data'
@@ -36,29 +36,21 @@ class GotenbergService
                     'files' => [
                         'file' => [
                             'name' => 'file',
-                            'contents' => $file,
+                            'contents' => fopen($filePath, 'r')
                         ],
                     ],
                 ],
-//                'body' => [
-//                    'files' => [
-//                        'file' => [
-//                            'name' => 'file',
-//                            'contents' => fopen(__DIR__.'/../../templates/pdf/index.html', 'r'),
-//                        ],
-//                    ],
-//                ],
             ]
         );
         $content = $response->getContent();
         return $content;
     }
 
-    public function generatePdfUrl($gotenberg_api, $url): string
+    public function generatePdfUrl($gotenbergApi, $url): string
     {
         $response = $this->client->request(
             'POST',
-            $gotenberg_api.'/forms/chromium/convert/url',
+            $gotenbergApi.'/forms/chromium/convert/url',
             [
                 'headers' => [
                     'Content-Type'=>'multipart/form-data'

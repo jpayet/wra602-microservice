@@ -5,6 +5,8 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     microservice_host: '%env(GOTENBERG_API)%'
+    public_temp_relative_directory: 'temp'
+    public_temp_absolute_directory: '%kernel.project_dir%/%public_temp_relative_directory%'
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -22,3 +24,7 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    App\Controller\GeneratePdfController:
+        arguments:
+            $publicTempAbsoluteDirectory: '%public_temp_absolute_directory%'

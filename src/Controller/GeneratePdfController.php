@@ -11,12 +11,29 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class GeneratePdfController extends AbstractController
 {
+    private string $publicTempAbsoluteDirectory;
+    public function __construct(string $publicTempAbsoluteDirectory)
+    {
+        $this->publicTempAbsoluteDirectory = $publicTempAbsoluteDirectory;
+    }
+
     #[Route('/generate-pdf-html', name: 'app_generate_pdf_html', methods: ['POST'])]
     public function generatePdfHtml(GotenbergService $gotenbergService, ParameterBagInterface $parameterBag, Request $request): StreamedResponse
     {
         $gotenberg_api = $parameterBag->get('microservice_host');
-        $file = $request->files->get('index.html');
-        $content = $gotenbergService->generatePdfHtml($gotenberg_api, $file);
+        $file = $request->files->get('file');
+
+        $tempDir = $this->publicTempAbsoluteDirectory . uniqid();
+        mkdir($tempDir, 0777, true);
+
+        $file->move($tempDir, 'index.html');
+        $filePath = $tempDir.'/'. 'index.html';
+        chmod($filePath, 0777);
+
+        $content = $gotenbergService->generatePdfHtml($gotenberg_api, $filePath);
+
+        unlink($filePath);
+        rmdir($tempDir);
 
         return new StreamedResponse(function () use ($content) {
             header('Content-Type: application/pdf');
